@@ -1,0 +1,311 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manga Archive</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reggae+One&family=Rock+Salt&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--bg:#07070a;
+--ink:rgba(255,255,255,.9);
+--muted:rgba(255,255,255,.55);
+--panel:rgba(255,255,255,.06);
+--stroke:rgba(255,255,255,.14);
+--radius:18px;
+--shadow:0 20px 60px rgba(0,0,0,.7);
+
+--railW:min(240px,22vw);
+--gap:18px;
+}
+
+body{
+margin:0;
+background:var(--bg);
+color:var(--ink);
+font-family:Inter,system-ui;
+}
+
+.hero{
+text-align:center;
+padding:42px 16px 24px;
+border-bottom:1px solid var(--stroke);
+}
+
+.hero-title{
+font-family:"Reggae One";
+font-size:clamp(2.2rem,7vw,5rem);
+margin:0;
+}
+
+.hero-sub{
+margin-top:8px;
+color:var(--muted);
+}
+
+.top-ad{
+max-width:1100px;
+margin:20px auto 0;
+}
+
+.ad-slot{
+border:1px dashed rgba(255,255,255,.25);
+padding:16px;
+text-align:center;
+border-radius:14px;
+background:rgba(255,255,255,.05);
+color:var(--muted);
+}
+
+.layout{
+display:grid;
+grid-template-columns:var(--railW) 1fr var(--railW);
+gap:var(--gap);
+max-width:1500px;
+margin:auto;
+padding:18px;
+}
+
+.center{
+max-width:1100px;
+margin:auto;
+width:100%;
+}
+
+.rail{
+position:sticky;
+top:80px;
+}
+
+details{
+margin:16px 0;
+border-radius:var(--radius);
+overflow:hidden;
+border:2px solid var(--stroke);
+background:var(--panel);
+box-shadow:var(--shadow);
+}
+
+summary{
+cursor:pointer;
+padding:14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.doc{
+font-weight:800;
+letter-spacing:.3px;
+}
+
+.id{
+font-size:12px;
+color:var(--muted);
+font-family:monospace;
+}
+
+.content{
+background:black;
+}
+
+iframe{
+width:100%;
+height:85vh;
+border:0;
+}
+
+.between-ad{
+margin:14px 0;
+}
+
+.pill{
+background:rgba(255,255,255,.1);
+padding:6px 10px;
+border-radius:999px;
+font-size:12px;
+text-decoration:none;
+color:white;
+}
+
+.nav{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+padding:12px;
+border-bottom:1px solid var(--stroke);
+}
+
+.nav a{
+text-decoration:none;
+padding:6px 12px;
+background:rgba(255,255,255,.07);
+border-radius:999px;
+color:white;
+font-size:13px;
+}
+
+@media(max-width:1100px){
+
+.layout{
+grid-template-columns:1fr;
+}
+
+.rail{
+position:relative;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header class="hero">
+<h1 class="hero-title">Full Manga Series</h1>
+<p class="hero-sub">Chapter Viewer</p>
+
+<div class="top-ad">
+<div class="ad-slot">TOP AD SLOT</div>
+</div>
+
+</header>
+
+<nav class="nav" id="nav"></nav>
+
+<div class="layout">
+
+<aside class="rail">
+<div class="ad-slot">LEFT AD</div>
+</aside>
+
+<main class="center">
+<div id="container"></div>
+</main>
+
+<aside class="rail">
+<div class="ad-slot">RIGHT AD</div>
+</aside>
+
+</div>
+
+<script>
+
+/* ========= SETTINGS ========= */
+
+const TOTAL_PAGES = 6
+const DATA_PREFIX = "data_"
+
+/* ============================ */
+
+function getPage(){
+
+const url = new URL(location)
+const p = parseInt(url.searchParams.get("p")) || 1
+return p
+
+}
+
+function buildNav(){
+
+const nav = document.getElementById("nav")
+const current = getPage()
+
+for(let i=1;i<=TOTAL_PAGES;i++){
+
+const a = document.createElement("a")
+a.href = "?p="+i
+a.textContent = "Page "+i
+
+if(i===current) a.style.background="rgba(255,255,255,.2)"
+
+nav.appendChild(a)
+
+}
+
+}
+
+function makeAd(){
+
+const div=document.createElement("div")
+div.className="between-ad"
+
+div.innerHTML='<div class="ad-slot">AD SLOT</div>'
+
+return div
+
+}
+
+function makeCard(id,i){
+
+const src=`https://drive.google.com/file/d/${id}/preview`
+
+const d=document.createElement("details")
+
+d.innerHTML=`
+
+<summary>
+
+<div>
+
+<div class="doc">Chapter: ${i+1}</div>
+<div class="id">${id}</div>
+
+</div>
+
+<a class="pill" target="_blank" href="${src}">Open</a>
+
+</summary>
+
+<div class="content">
+
+<iframe loading="lazy" src="${src}"></iframe>
+
+</div>
+
+`
+
+return d
+
+}
+
+async function init(){
+
+buildNav()
+
+const page=getPage()
+
+const res=await fetch(DATA_PREFIX+page)
+
+const txt=await res.text()
+
+const ids=txt.split(/\n/).map(x=>x.trim()).filter(Boolean)
+
+const container=document.getElementById("container")
+
+ids.forEach((id,i)=>{
+
+container.appendChild(makeCard(id,i))
+
+if(i<ids.length-1){
+
+container.appendChild(makeAd())
+
+}
+
+})
+
+}
+
+init()
+
+</script>
+
+</body>
+</html>
