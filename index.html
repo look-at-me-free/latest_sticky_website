@@ -23,21 +23,37 @@
   --gap:18px;
 }
 
-body{ margin:0; background:var(--bg); color:var(--ink); font-family:Inter,system-ui; }
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  background:
+    radial-gradient(900px 500px at 15% 0%, rgba(255,255,255,.06), transparent 60%),
+    radial-gradient(800px 550px at 85% 15%, rgba(255,255,255,.05), transparent 55%),
+    var(--bg);
+  color:var(--ink);
+  font-family:Inter,system-ui;
+}
 
 .hero{
   text-align:center;
-  padding:42px 16px 18px;
+  padding:44px 16px 18px;
   border-bottom:1px solid var(--stroke);
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,.05), transparent 75%);
 }
 
 .hero-title{
   font-family:"Reggae One";
   font-size:clamp(2.2rem,7vw,5rem);
   margin:0;
+  letter-spacing:.5px;
 }
 
-.hero-sub{ margin-top:8px; color:var(--muted); }
+.hero-sub{
+  margin-top:8px;
+  color:var(--muted);
+}
 
 .top-ad{ max-width:1100px; margin:18px auto 0; }
 
@@ -61,15 +77,19 @@ body{ margin:0; background:var(--bg); color:var(--ink); font-family:Inter,system
 
 .center{ max-width:1100px; margin:auto; width:100%; }
 
-.rail{ position:sticky; top:80px; }
+.rail{
+  position:sticky;
+  top:80px;
+}
 
 details{
   margin:16px 0;
   border-radius:var(--radius);
   overflow:hidden;
   border:2px solid var(--stroke);
-  background:var(--panel);
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
   box-shadow:var(--shadow);
+  backdrop-filter: blur(8px);
 }
 
 summary{
@@ -81,24 +101,83 @@ summary{
   gap:12px;
 }
 
-.doc{ font-weight:800; letter-spacing:.3px; }
-.id{ font-size:12px; color:var(--muted); font-family:monospace; margin-top:4px; }
+summary::-webkit-details-marker{ display:none; }
 
-.content{ background:black; }
+.leftstack{ text-align:left; }
 
-iframe{ width:100%; height:85vh; border:0; }
+.doc{
+  font-weight:800;
+  letter-spacing:.3px;
+  line-height:1.15;
+}
 
-.between-ad{ margin:14px 0; }
+.id{
+  font-size:12px;
+  color:var(--muted);
+  font-family:monospace;
+  margin-top:6px;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
 
 .pill{
-  background:rgba(255,255,255,.1);
-  padding:6px 10px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.12);
+  padding:7px 10px;
   border-radius:999px;
   font-size:12px;
   text-decoration:none;
   color:white;
   white-space:nowrap;
+  transition:transform .12s ease, background .12s ease;
 }
+
+.pill:hover{
+  background:rgba(255,255,255,.16);
+  transform:translateY(-1px);
+}
+
+.pill.primary{
+  background:rgba(255,255,255,.14);
+  border-color:rgba(255,255,255,.18);
+}
+
+.pill.ghost{
+  background:transparent;
+}
+
+.chev{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-right:2px solid rgba(255,255,255,.7);
+  border-bottom:2px solid rgba(255,255,255,.7);
+  transform:rotate(-45deg);
+  margin-left:8px;
+  opacity:.85;
+}
+
+details[open] .chev{
+  transform:rotate(45deg);
+  margin-top:-2px;
+}
+
+.content{
+  background:#000;
+  border-top:1px solid rgba(255,255,255,.10);
+}
+
+iframe{
+  width:100%;
+  height:85vh;
+  border:0;
+}
+
+.between-ad{ margin:14px 0; }
 
 .nav{
   display:flex;
@@ -130,7 +209,7 @@ iframe{ width:100%; height:85vh; border:0; }
 }
 
 .search{
-  width:min(720px, 100%);
+  width:min(760px, 100%);
   display:flex;
   gap:10px;
   align-items:center;
@@ -165,15 +244,19 @@ iframe{ width:100%; height:85vh; border:0; }
   border-radius:999px;
   cursor:pointer;
   font-size:13px;
+  transition:transform .12s ease, background .12s ease;
 }
 
-.smallbtn:hover{ background:rgba(255,255,255,.1); }
+.smallbtn:hover{
+  background:rgba(255,255,255,.1);
+  transform:translateY(-1px);
+}
 
 .meta{
   color:var(--muted);
   font-size:12px;
   text-align:center;
-  margin:8px 0 0;
+  margin:10px 0 0;
 }
 
 @media(max-width:1100px){
@@ -187,7 +270,7 @@ iframe{ width:100%; height:85vh; border:0; }
 
 <header class="hero">
   <h1 class="hero-title">Full Manga Series</h1>
-  <p class="hero-sub">Chapter Viewer</p>
+  <p class="hero-sub">Search • Expand • Read</p>
 
   <div class="toolbar">
     <div class="search">
@@ -195,7 +278,9 @@ iframe{ width:100%; height:85vh; border:0; }
       <span class="kbd">Enter</span>
     </div>
     <button class="smallbtn" id="clear">Clear</button>
+    <button class="smallbtn" id="openFirst">Open First</button>
   </div>
+
   <div class="meta" id="meta"></div>
 
   <div class="top-ad">
@@ -203,7 +288,7 @@ iframe{ width:100%; height:85vh; border:0; }
   </div>
 </header>
 
-<nav class="nav" id="nav"></nav>
+<nav class="nav" id="nav" style="display:none;"></nav>
 
 <div class="layout">
   <aside class="rail"><div class="ad-slot">LEFT AD</div></aside>
@@ -214,48 +299,14 @@ iframe{ width:100%; height:85vh; border:0; }
 <script>
 /* ========= SETTINGS ========= */
 
-// Worker base URL (no trailing slash)
-const API_BASE = "https://drive-title-worker.al-gutierrez-contact.workers.dev";
+// Local text file name
+// Put this next to index.html in the repo
+const DATA_FILE = "drive_files.txt";
 
-// Your worker must support:
-/// GET  /list?page=1&per_page=25  -> { total_pages, items:[{id,title}] }
-/// GET  /search?q=dragon&page=1&per_page=200  -> same shape (or at least {items:[]})
-//
-// If you only have one endpoint, you can point BOTH to the same route.
-const LIST_PATH   = "/list";
-const SEARCH_PATH = "/search";
-
-// Page size for normal browsing
-const PER_PAGE = 25;
-
-// Search pulls more items so sorting feels “global”
-const SEARCH_PER_PAGE = 250;
+// If you want to show an ad between entries
+const AD_EVERY = 1; // 1 = between every entry (your current behavior). Set to 0 to disable.
 
 /* ============================ */
-
-function getPage(){
-  const url = new URL(location.href);
-  const p = parseInt(url.searchParams.get("p"), 10);
-  return Number.isFinite(p) && p > 0 ? p : 1;
-}
-
-function getQuery(){
-  const url = new URL(location.href);
-  const q = url.searchParams.get("q");
-  return (q || "").trim();
-}
-
-function setParams(params){
-  const url = new URL(location.href);
-  Object.entries(params).forEach(([k,v]) => {
-    if(v === null || v === undefined || String(v).trim() === ""){
-      url.searchParams.delete(k);
-    }else{
-      url.searchParams.set(k, String(v));
-    }
-  });
-  history.replaceState(null, "", url.toString());
-}
 
 function escapeHtml(s){
   return String(s)
@@ -266,250 +317,231 @@ function escapeHtml(s){
     .replaceAll("'","&#39;");
 }
 
-function buildNav(totalPages){
-  const nav = document.getElementById("nav");
-  nav.innerHTML = "";
-
-  const current = getPage();
-  const q = getQuery();
-
-  // keep nav compact if huge
-  const max = 18;
-  let start = 1, end = totalPages;
-  if(totalPages > max){
-    const half = Math.floor(max/2);
-    start = Math.max(1, current - half);
-    end = Math.min(totalPages, start + max - 1);
-    start = Math.max(1, end - max + 1);
-  }
-
-  for(let i=start;i<=end;i++){
-    const a = document.createElement("a");
-    a.href = q ? `?q=${encodeURIComponent(q)}&p=${i}` : `?p=${i}`;
-    a.textContent = "Page " + i;
-    if(i === current) a.style.background = "rgba(255,255,255,.2)";
-    nav.appendChild(a);
-  }
-}
-
 function makeAd(){
-  const div = document.createElement("div");
-  div.className = "between-ad";
-  div.innerHTML = '<div class="ad-slot">AD SLOT</div>';
+  const div=document.createElement("div");
+  div.className="between-ad";
+  div.innerHTML='<div class="ad-slot">AD SLOT</div>';
   return div;
 }
 
-// Pull a chapter number out of titles like:
-// "Dragon Ball 12.pdf", "DBZ Chapter 203", "dragonball z chapter 003 - blah"
-// Returns a number or Infinity (so unsortable items sink)
+// Extract a chapter number from common title patterns.
+// Returns a number; if nothing found returns Infinity so it sinks.
 function extractChapterNumber(title){
   const t = (title || "").toLowerCase();
 
-  // Prefer "chapter 123" patterns
-  let m = t.match(/\bchapter\D{0,6}(\d{1,5})\b/);
+  // "chapter 203" / "chapter: 203"
+  let m = t.match(/\bchapter\D{0,8}(\d{1,5})\b/);
   if(m) return parseInt(m[1], 10);
 
-  // Then "ch 123"
-  m = t.match(/\bch\D{0,6}(\d{1,5})\b/);
+  // "ch 203"
+  m = t.match(/\bch\D{0,8}(\d{1,5})\b/);
   if(m) return parseInt(m[1], 10);
 
-  // Then any standalone number (common for "Dragon Ball 12.pdf")
+  // "vol 12" (optional)
+  m = t.match(/\bvol(?:ume)?\D{0,8}(\d{1,4})\b/);
+  if(m) return parseInt(m[1], 10);
+
+  // "Dragon Ball 12.pdf" -> picks 12
   m = t.match(/\b(\d{1,5})\b/);
   if(m) return parseInt(m[1], 10);
 
   return Infinity;
 }
 
-// item = { id: "FILE_ID", title: "Dragon Ball 1.pdf" }
-function makeCard(item, indexOnPage, page){
-  const id = item.id;
-  const title = item.title || `Chapter ${((page - 1) * PER_PAGE) + indexOnPage + 1}`;
-  const src = `https://drive.google.com/file/d/${id}/preview`;
+// Parse drive_files.txt lines.
+// Supported:
+///  FILE_ID | Title
+///  FILE_ID
+function parseDriveFileText(txt){
+  const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const items = [];
 
-  const d = document.createElement("details");
-  d.innerHTML = `
-    <summary>
-      <div>
-        <div class="doc">${escapeHtml(title)}</div>
-        <div class="id">${escapeHtml(id)}</div>
-      </div>
-      <a class="pill" target="_blank" rel="noopener" href="${src}">Open</a>
-    </summary>
-    <div class="content">
-      <iframe loading="lazy" src="${src}"></iframe>
-    </div>
-  `;
-  return d;
-}
+  for(const line of lines){
+    // allow "id | title" with any spacing around |
+    const parts = line.split("|");
+    const id = (parts[0] || "").trim();
+    const title = parts.slice(1).join("|").trim(); // keep extra pipes in title if any
 
-async function apiGet(path, params){
-  const url = new URL(API_BASE + path);
-  Object.entries(params || {}).forEach(([k,v]) => {
-    if(v !== undefined && v !== null && String(v).trim() !== ""){
-      url.searchParams.set(k, String(v));
-    }
-  });
+    if(!id) continue;
 
-  const res = await fetch(url.toString(), { cache: "no-store" });
-  if(!res.ok){
-    const text = await res.text().catch(()=> "");
-    throw new Error(`API ${res.status}: ${text || res.statusText}`);
+    items.push({
+      id,
+      title: title || ""
+    });
   }
-  return res.json();
+
+  return items;
 }
 
-function normalizeItems(items){
-  // accept {items:[{id,title}]} OR [{id,title}] just in case
-  if(Array.isArray(items)) return items;
-  if(items && Array.isArray(items.items)) return items.items;
-  return [];
-}
-
-function filterClientSide(items, q){
-  if(!q) return items;
-  const needle = q.toLowerCase();
-  return items.filter(it => (it.title || "").toLowerCase().includes(needle));
+function normalizeTitle(item, index){
+  // If title missing, display as Chapter N (1-based)
+  if(item.title && item.title.trim()) return item.title.trim();
+  return `Chapter ${index + 1}`;
 }
 
 function sortNumerically(items){
-  // stable-ish numeric sort:
   return [...items].sort((a,b) => {
     const an = extractChapterNumber(a.title);
     const bn = extractChapterNumber(b.title);
     if(an !== bn) return an - bn;
 
-    // tie-breaker: title string
+    // tie break by title
     const at = (a.title || "").toLowerCase();
     const bt = (b.title || "").toLowerCase();
     if(at < bt) return -1;
     if(at > bt) return 1;
 
-    // final tie: id
+    // final tie by id
     return String(a.id||"").localeCompare(String(b.id||""));
   });
+}
+
+function filterItems(items, q){
+  if(!q) return items;
+  const needle = q.toLowerCase();
+  return items.filter(it => {
+    const hay = `${it.id} ${it.title || ""}`.toLowerCase();
+    return hay.includes(needle);
+  });
+}
+
+function makeCard(item, displayIndex){
+  const id = item.id;
+  const title = normalizeTitle(item, displayIndex);
+  const src = `https://drive.google.com/file/d/${id}/preview`;
+
+  const d = document.createElement("details");
+
+  d.innerHTML = `
+    <summary>
+      <div class="leftstack">
+        <div class="doc">${escapeHtml(title)}</div>
+        <div class="id">${escapeHtml(id)}</div>
+      </div>
+
+      <div class="actions">
+        <span class="pill primary expandPill">EXPAND <span class="chev"></span></span>
+        <a class="pill" target="_blank" rel="noopener" href="${src}">OPEN</a>
+      </div>
+    </summary>
+
+    <div class="content">
+      <iframe loading="lazy" src="${src}"></iframe>
+    </div>
+  `;
+
+  // Make the EXPAND pill toggle the details (more obvious than clicking summary)
+  const pill = d.querySelector(".expandPill");
+  pill.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    d.open = !d.open;
+  });
+
+  return d;
 }
 
 function setMeta(text){
   document.getElementById("meta").textContent = text || "";
 }
 
+async function loadAllItems(){
+  const res = await fetch(DATA_FILE, { cache: "no-store" });
+  if(!res.ok){
+    throw new Error(`Could not load ${DATA_FILE} (${res.status})`);
+  }
+  const txt = await res.text();
+  return parseDriveFileText(txt);
+}
+
+function openFirstVisible(){
+  const first = document.querySelector("#container details");
+  if(first){
+    first.open = true;
+    first.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+}
+
 async function render(){
   const container = document.getElementById("container");
   container.innerHTML = "";
 
-  const page = getPage();
-  const q = getQuery();
-
-  // fill search box from URL
-  const input = document.getElementById("q");
-  if(input.value.trim() !== q) input.value = q;
+  const q = document.getElementById("q").value.trim();
 
   try{
-    let data;
+    // load everything once
+    const all = await loadAllItems();
 
-    if(q){
-      // Search mode
-      // 1) Try the server-side search endpoint
-      // 2) If your worker doesn’t have it yet, you can temporarily fall back to
-      //    pulling /list and filtering client-side (works, just slower)
-      try{
-        data = await apiGet(SEARCH_PATH, { q, page: 1, per_page: SEARCH_PER_PAGE });
-      }catch(e){
-        // fallback to /list page 1..N is too heavy, so we do only page 1 and filter,
-        // but we also show a helpful error so you know to implement /search later.
-        console.warn("Search endpoint failed, falling back to list+filter:", e);
-        const list = await apiGet(LIST_PATH, { page: 1, per_page: SEARCH_PER_PAGE });
-        data = { items: filterClientSide(normalizeItems(list), q), total_pages: 1 };
-      }
+    // filter + sort
+    const filtered = filterItems(all, q);
+    const sorted = sortNumerically(filtered);
 
-      const itemsRaw = normalizeItems(data);
-      const items = sortNumerically(itemsRaw);
+    setMeta(`${sorted.length.toLocaleString()} result(s) • sorted by extracted chapter number`);
 
-      buildNav(1);
-      setMeta(`Search: "${q}" • ${items.length} result(s) • sorted by extracted chapter number`);
-
-      items.forEach((item, i) => {
-        container.appendChild(makeCard(item, i, 1));
-        if(i < items.length - 1) container.appendChild(makeAd());
-      });
-
-      if(!items.length){
-        const empty = document.createElement("div");
-        empty.className = "ad-slot";
-        empty.textContent = "No matches. Try fewer words or just a number (e.g. 12, 203).";
-        container.appendChild(empty);
-      }
-
+    if(!sorted.length){
+      const empty = document.createElement("div");
+      empty.className = "ad-slot";
+      empty.textContent = "No matches. Try fewer words or just a number (e.g. 12, 203).";
+      container.appendChild(empty);
       return;
     }
 
-    // Browse mode
-    data = await apiGet(LIST_PATH, { page, per_page: PER_PAGE });
-
-    const totalPages = Number.isFinite(data.total_pages) && data.total_pages > 0 ? data.total_pages : 1;
-    buildNav(totalPages);
-
-    let items = normalizeItems(data);
-    items = sortNumerically(items);
-
-    setMeta(`Page ${page}/${totalPages} • ${items.length} item(s) on this page • sorted by extracted chapter number`);
-
-    items.forEach((item, i) => {
-      container.appendChild(makeCard(item, i, page));
-      if(i < items.length - 1) container.appendChild(makeAd());
+    sorted.forEach((item, i) => {
+      container.appendChild(makeCard(item, i));
+      if(AD_EVERY && i < sorted.length - 1){
+        container.appendChild(makeAd());
+      }
     });
 
-    if(!items.length){
-      const empty = document.createElement("div");
-      empty.className = "ad-slot";
-      empty.textContent = "No items returned for this page.";
-      container.appendChild(empty);
-    }
+    // auto-open first item so users instantly understand "expand"
+    openFirstVisible();
 
   }catch(err){
-    buildNav(1);
     setMeta("");
-
     const box = document.createElement("div");
     box.className = "ad-slot";
-    box.textContent = "Failed to load from D1 Worker: " + (err?.message || String(err));
+    box.textContent = "Failed to load: " + (err?.message || String(err));
     container.appendChild(box);
 
     const hint = document.createElement("div");
     hint.className = "ad-slot";
     hint.style.marginTop = "12px";
-    hint.textContent = `Expected API: ${API_BASE}${LIST_PATH}?page=1&per_page=${PER_PAGE} (and optional ${API_BASE}${SEARCH_PATH}?q=...)`;
+    hint.textContent = `Make sure ${DATA_FILE} is in the same folder as index.html and contains lines like: FILE_ID | Title`;
     container.appendChild(hint);
   }
 }
 
-function wireSearch(){
+function wireUI(){
   const input = document.getElementById("q");
   const clear = document.getElementById("clear");
+  const openFirst = document.getElementById("openFirst");
 
   input.addEventListener("keydown", (e) => {
     if(e.key === "Enter"){
-      const q = input.value.trim();
-      setParams({ q: q || null, p: 1 });
       render();
     }
   });
 
   clear.addEventListener("click", () => {
     input.value = "";
-    setParams({ q: null, p: 1 });
     render();
+  });
+
+  openFirst.addEventListener("click", () => {
+    openFirstVisible();
+  });
+
+  // optional: live filtering (feels slick). comment out if you prefer Enter only.
+  input.addEventListener("input", () => {
+    // tiny debounce
+    window.clearTimeout(window.__t);
+    window.__t = window.setTimeout(render, 120);
   });
 }
 
-wireSearch();
+wireUI();
 render();
 </script>
 
 </body>
 </html>
-
-
-
-
-
