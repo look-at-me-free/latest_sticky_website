@@ -9,7 +9,11 @@
       "entries": [
         { "slug": "chapter_1", "path": "book_1/chapter_1", "type": "chapter", "subtitle": "Chapter 1" },
         { "slug": "chapter_2", "path": "book_1/chapter_2", "type": "chapter", "subtitle": "Chapter 2" },
-        { "slug": "chapter_3", "path": "book_1/chapter_3", "type": "chapter", "subtitle": "Chapter 3" }
+        { "slug": "chapter_3", "path": "book_1/chapter_3", "type": "chapter", "subtitle": "Chapter 3" },
+        { "slug": "chapter_4", "path": "book_1/chapter_4", "type": "chapter", "subtitle": "Chapter 4" },
+        { "slug": "chapter_5", "path": "book_1/chapter_5", "type": "chapter", "subtitle": "Chapter 5" },
+        { "slug": "chapter_6", "path": "book_1/chapter_6", "type": "chapter", "subtitle": "Chapter 6" },
+        { "slug": "chapter_7", "path": "book_1/chapter_7", "type": "chapter", "subtitle": "Chapter 7" }
       ]
     },
     {
