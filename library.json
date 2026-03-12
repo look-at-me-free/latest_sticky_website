@@ -432,6 +432,68 @@
           "subtitle": "Volume 1 · Act 7"
         }
       ]
+    },
+    {
+      "id": 1001,
+      "slug": "Parasyte",
+      "display": "Parasyte",
+      "top_pill": true,
+      "entries": [
+        {
+          "slug": "chapter_1",
+          "path": "chapter_1",
+          "type": "chapter",
+          "subtitle": "Chapter 1"
+        },
+        {
+          "slug": "chapter_2",
+          "path": "chapter_2",
+          "type": "chapter",
+          "subtitle": "Chapter 2"
+        },
+        {
+          "slug": "chapter_3",
+          "path": "chapter_3",
+          "type": "chapter",
+          "subtitle": "Chapter 3"
+        },
+        {
+          "slug": "chapter_4",
+          "path": "chapter_4",
+          "type": "chapter",
+          "subtitle": "Chapter 4"
+        },
+        {
+          "slug": "chapter_5",
+          "path": "chapter_5",
+          "type": "chapter",
+          "subtitle": "Chapter 5"
+        },
+        {
+          "slug": "chapter_6",
+          "path": "chapter_6",
+          "type": "chapter",
+          "subtitle": "Chapter 6"
+        },
+        {
+          "slug": "chapter_7",
+          "path": "chapter_7",
+          "type": "chapter",
+          "subtitle": "Chapter 7"
+        },
+        {
+          "slug": "chapter_8",
+          "path": "chapter_8",
+          "type": "chapter",
+          "subtitle": "Chapter 8"
+        },
+        {
+          "slug": "chapter_9",
+          "path": "chapter_9",
+          "type": "chapter",
+          "subtitle": "Chapter 9"
+        }
+      ]
     }
   ]
 }
