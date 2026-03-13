@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wallace Archive Reader</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&family=Rampart+One&family=Rubik+Iso&family=Rubik+Broken+Fax&display=swap" rel="stylesheet">
@@ -12,7 +13,7 @@
     (function () {
       var path = window.location.pathname.toLowerCase();
 
-      if (path.includes("/mobile.html")) return;
+      if (path.includes("mobile.html")) return;
 
       var isMobile =
         /android|iphone|ipad|ipod|mobile|tablet|silk|kindle|blackberry|opera mini|iemobile/i.test(navigator.userAgent) ||
@@ -20,11 +21,10 @@
 
       if (!isMobile) return;
 
-      var target = new URL(window.location.origin + "/mobile.html");
-      target.search = window.location.search;
-      target.hash = window.location.hash;
+      var basePath = window.location.pathname.replace(/\/[^\/]*$/, "/");
+      var target = window.location.origin + basePath + "mobile.html" + window.location.search + window.location.hash;
 
-      window.location.replace(target.toString());
+      window.location.replace(target);
     })();
   </script>
 
@@ -435,14 +435,14 @@
       justify-content:center;
     }
 
-   .layout{
-     max-width:1680px;
-     margin:0 auto;
-     padding:8px;
-     display:grid;
-     grid-template-columns:var(--railW) minmax(0, 1fr) var(--railW);
-     gap:12px;
-     align-items:start;
+    .layout{
+      max-width:1680px;
+      margin:0 auto;
+      padding:8px;
+      display:grid;
+      grid-template-columns:var(--railW) minmax(0, 1fr) var(--railW);
+      gap:12px;
+      align-items:start;
     }
 
     .reader{
@@ -886,4 +886,4 @@
 
   <script defer src="index.js"></script>
 </body>
-</html>"
+</html>
