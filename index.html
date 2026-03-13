@@ -8,6 +8,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&family=Rampart+One&family=Rubik+Iso&family=Rubik+Broken+Fax&display=swap" rel="stylesheet">
 
+  <script>
+    (function () {
+      var path = window.location.pathname.toLowerCase();
+
+      if (path.includes("/mobile.html")) return;
+
+      var isMobile =
+        /android|iphone|ipad|ipod|mobile|tablet|silk|kindle|blackberry|opera mini|iemobile/i.test(navigator.userAgent) ||
+        window.innerWidth <= 980;
+
+      if (!isMobile) return;
+
+      var target = new URL(window.location.origin + "/mobile.html");
+      target.search = window.location.search;
+      target.hash = window.location.hash;
+
+      window.location.replace(target.toString());
+    })();
+  </script>
+
   <script async src="https://a.magsrv.com/ad-provider.js"></script>
   <script>
     window.AdProvider = window.AdProvider || [];
@@ -866,4 +886,4 @@
 
   <script defer src="index.js"></script>
 </body>
-</html>
+</html>"
