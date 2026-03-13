@@ -323,10 +323,7 @@
     const subids = getSubids(manifest);
 
     const wrap = document.createElement("div");
-    wrap.className = "slot";
-
-    const grid = document.createElement("div");
-    grid.className = "between-grid";
+    wrap.className = "between-grid";
 
     for (let i = 1; i <= slotCount; i++) {
       const slot = document.createElement("div");
@@ -334,10 +331,9 @@
       slot.appendChild(
         makeIns(ZONES.betweenMulti, subids.between, subids.work, Number(`${groupNumber}${i}`))
       );
-      grid.appendChild(slot);
+      wrap.appendChild(slot);
     }
 
-    wrap.appendChild(grid);
     return wrap;
   }
 
@@ -345,19 +341,15 @@
     const subids = getSubids(manifest);
 
     const wrap = document.createElement("div");
-    wrap.className = "slot";
-
-    const grid = document.createElement("div");
-    grid.className = "end-grid";
+    wrap.className = "end-grid";
 
     for (let i = 1; i <= count; i++) {
       const slot = document.createElement("div");
       slot.className = "slot";
       slot.appendChild(makeIns(ZONES.betweenMulti, subids.between, subids.work, 9000 + i));
-      grid.appendChild(slot);
+      wrap.appendChild(slot);
     }
 
-    wrap.appendChild(grid);
     return wrap;
   }
 
@@ -974,7 +966,7 @@
 
     reader.appendChild(buildTraversal("top"));
 
-    const betweenEvery = Number(manifest.ads?.between_every) || 0;
+    const betweenEvery = IS_MOBILE_READER ? 2 : (Number(manifest.ads?.between_every) || 0);
     const betweenSlots = IS_MOBILE_READER ? 1 : (Number(manifest.ads?.between_slots) || 3);
     const finalBlock = IS_MOBILE_READER ? 0 : Math.max(Number(manifest.ads?.final_block) || 0, BOTTOM_AD_COUNT);
 
@@ -1011,10 +1003,7 @@
     bottomAnchor.className = "reader-anchor";
     reader.appendChild(bottomAnchor);
 
-    if (!IS_MOBILE_READER) {
-      serveAds();
-    }
-
+    serveAds();
     startRefreshTimers();
     updateChapterProgress(0);
 
