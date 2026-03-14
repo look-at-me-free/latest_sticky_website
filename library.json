@@ -183,7 +183,27 @@
     { "slug": "chapter_4", "path": "volume_1/chapter_4", "type": "chapter", "subtitle": "Chapter 4" },
     { "slug": "chapter_5", "path": "volume_1/chapter_5", "type": "chapter", "subtitle": "Chapter 5" },
     { "slug": "chapter_6", "path": "volume_1/chapter_6", "type": "chapter", "subtitle": "Chapter 6" },
-    { "slug": "chapter_7", "path": "volume_1/chapter_7", "type": "chapter", "subtitle": "Chapter 7" }
+    { "slug": "chapter_7", "path": "volume_1/chapter_7", "type": "chapter", "subtitle": "Chapter 7" },
+
+    { "slug": "chapter_8", "path": "volume_2/chapter_8", "type": "chapter", "subtitle": "Chapter 8" },
+    { "slug": "chapter_9", "path": "volume_2/chapter_9", "type": "chapter", "subtitle": "Chapter 9" },
+    { "slug": "chapter_10", "path": "volume_2/chapter_10", "type": "chapter", "subtitle": "Chapter 10" },
+    { "slug": "chapter_11", "path": "volume_2/chapter_11", "type": "chapter", "subtitle": "Chapter 11" },
+    { "slug": "chapter_12", "path": "volume_2/chapter_12", "type": "chapter", "subtitle": "Chapter 12" },
+    { "slug": "chapter_13", "path": "volume_2/chapter_13", "type": "chapter", "subtitle": "Chapter 13" },
+    { "slug": "chapter_14", "path": "volume_2/chapter_14", "type": "chapter", "subtitle": "Chapter 14" },
+    { "slug": "chapter_15", "path": "volume_2/chapter_15", "type": "chapter", "subtitle": "Chapter 15" },
+    { "slug": "chapter_16", "path": "volume_2/chapter_16", "type": "chapter", "subtitle": "Chapter 16" },
+
+    { "slug": "chapter_17", "path": "volume_3/chapter_17", "type": "chapter", "subtitle": "Chapter 17" },
+    { "slug": "chapter_18", "path": "volume_3/chapter_18", "type": "chapter", "subtitle": "Chapter 18" },
+    { "slug": "chapter_19", "path": "volume_3/chapter_19", "type": "chapter", "subtitle": "Chapter 19" },
+    { "slug": "chapter_20", "path": "volume_3/chapter_20", "type": "chapter", "subtitle": "Chapter 20" },
+    { "slug": "chapter_21", "path": "volume_3/chapter_21", "type": "chapter", "subtitle": "Chapter 21" },
+    { "slug": "chapter_22", "path": "volume_3/chapter_22", "type": "chapter", "subtitle": "Chapter 22" },
+    { "slug": "chapter_23", "path": "volume_3/chapter_23", "type": "chapter", "subtitle": "Chapter 23" },
+    { "slug": "chapter_24", "path": "volume_3/chapter_24", "type": "chapter", "subtitle": "Chapter 24" },
+    { "slug": "chapter_25", "path": "volume_3/chapter_25", "type": "chapter", "subtitle": "Chapter 25" }
   ]
 },
     
