@@ -1,0 +1,76 @@
+name: Index Switcher
+
+on:
+  schedule:
+    - cron: "0 12 */2 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  switch-index:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Decide which index to publish
+        id: decide
+        shell: bash
+        run: |
+          set -e
+
+          if [ ! -f "date.txt" ]; then
+            echo "date.txt not found"
+            exit 1
+          fi
+
+          RAW_DATE=$(tr -d '\r\n' < date.txt | xargs)
+
+          if [ -z "$RAW_DATE" ]; then
+            echo "date.txt is empty"
+            exit 1
+          fi
+
+          echo "date.txt contains: $RAW_DATE"
+
+          TODAY=$(date -u +%F)
+          FILE_TS=$(date -u -d "$RAW_DATE" +%s)
+          TODAY_TS=$(date -u -d "$TODAY" +%s)
+
+          DIFF_DAYS=$(( (TODAY_TS - FILE_TS) / 86400 ))
+
+          echo "Today is: $TODAY"
+          echo "Difference in days: $DIFF_DAYS"
+
+          if [ "$DIFF_DAYS" -gt 1 ]; then
+            echo "Using reveal_index.html"
+            cp reveal_index.html index.html
+            echo "mode=reveal" >> "$GITHUB_OUTPUT"
+          else
+            echo "Using placeholder_index.html"
+            cp placeholder_index.html index.html
+            echo "mode=placeholder" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit updated index.html
+        shell: bash
+        run: |
+          set -e
+
+          if git diff --quiet -- index.html; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add index.html
+          git commit -m "Auto-switch index.html (${{
+            steps.decide.outputs.mode
+          }})"
+          git push
+
