@@ -19,7 +19,7 @@
   const MIN_GLOBAL_SERVE_GAP_MS = 1200;
   const MIN_SLOT_REFRESH_GAP_MS = 30000;
   const VIEWPORT_THRESHOLD = 0.2;
-  const INTERSTITIAL_DELAY_MS = 900;
+  const INTERSTITIAL_DELAY_MS = 1200;
   const VIDEO_SLIDER_DELAY_MS = 5000;
 
   const ZONES = {
@@ -29,12 +29,33 @@
     betweenMulti: 5867482
   };
 
+  // Exact exported special zones.
   const SPECIAL_ZONES = {
-    desktopInterstitial: { zoneId: 5880058, className: "eas6a97888e35" },
-    mobileInterstitial: { zoneId: 5880060, className: "eas6a97888e33" },
-    desktopVideoSlider: { zoneId: 5880066, className: "eas6a97888e31" },
-    desktopRecommend: { zoneId: 5880068, className: "eas6a97888e20" },
-    mobileSticky: { zoneId: 5880082, className: "eas6a97888e10" }
+    desktopInterstitial: {
+      zoneId: 5880058,
+      className: "eas6a97888e35",
+      host: "https://a.pemsrv.com/ad-provider.js"
+    },
+    mobileInterstitial: {
+      zoneId: 5880060,
+      className: "eas6a97888e33",
+      host: "https://a.pemsrv.com/ad-provider.js"
+    },
+    desktopVideoSlider: {
+      zoneId: 5880066,
+      className: "eas6a97888e31",
+      host: "https://a.magsrv.com/ad-provider.js"
+    },
+    desktopRecommend: {
+      zoneId: 5880068,
+      className: "eas6a97888e20",
+      host: "https://a.magsrv.com/ad-provider.js"
+    },
+    mobileSticky: {
+      zoneId: 5880082,
+      className: "eas6a97888e10",
+      host: "https://a.magsrv.com/ad-provider.js"
+    }
   };
 
   const LEFT_RAIL_IDS = [
@@ -74,6 +95,8 @@
   let videoSliderLoaded = false;
   let videoSliderScheduled = false;
   let mobileStickyLoaded = false;
+
+  const providerLoadPromises = new Map();
 
   function $(sel, root = document) {
     return root.querySelector(sel);
@@ -316,6 +339,34 @@
     window.setTimeout(() => serveAds(true), 700);
   }
 
+  function ensureAdProviderScript(src) {
+    if (!src) return Promise.resolve();
+
+    if (providerLoadPromises.has(src)) {
+      return providerLoadPromises.get(src);
+    }
+
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) {
+      const done = Promise.resolve();
+      providerLoadPromises.set(src, done);
+      return done;
+    }
+
+    const promise = new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.async = true;
+      s.type = "application/javascript";
+      s.src = src;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error(`Failed to load ad provider: ${src}`));
+      document.head.appendChild(s);
+    });
+
+    providerLoadPromises.set(src, promise);
+    return promise;
+  }
+
   function makeIns(zoneId, sub = 1, sub2 = 1, sub3 = 1, className = "eas6a97888e38") {
     const ins = document.createElement("ins");
     ins.className = className;
@@ -323,6 +374,13 @@
     ins.setAttribute("data-sub", String(sub));
     ins.setAttribute("data-sub2", String(sub2));
     ins.setAttribute("data-sub3", String(sub3));
+    return ins;
+  }
+
+  function makeSpecialIns(zoneId, className) {
+    const ins = document.createElement("ins");
+    ins.className = className;
+    ins.setAttribute("data-zoneid", String(zoneId));
     return ins;
   }
 
@@ -349,43 +407,64 @@
     return true;
   }
 
-  function mountSpecial(container, cfg) {
-    if (!container || !cfg) return;
-    refillSlot(container, cfg.zoneId, 1, 1, 1, cfg.className);
+  function createRuntimeMount(id) {
+    const mount = document.createElement("div");
+    mount.id = id;
+    mount.style.position = "relative";
+    mount.style.width = "0";
+    mount.style.height = "0";
+    mount.style.overflow = "visible";
+    mount.style.zIndex = "999999";
+    return mount;
+  }
+
+  async function mountRuntimeSpecial(id, cfg) {
+    if (!cfg) return null;
+    await ensureAdProviderScript(cfg.host);
+
+    let mount = document.getElementById(id);
+    if (!mount) {
+      mount = createRuntimeMount(id);
+      document.body.appendChild(mount);
+    }
+
+    mount.innerHTML = "";
+    mount.appendChild(makeSpecialIns(cfg.zoneId, cfg.className));
     serveAds(true);
+
+    return mount;
   }
 
   async function fireChapterInterstitial() {
-    const mount = document.getElementById(IS_MOBILE_READER ? "mobileInterstitialMount" : "desktopInterstitialMount");
     const cfg = IS_MOBILE_READER ? SPECIAL_ZONES.mobileInterstitial : SPECIAL_ZONES.desktopInterstitial;
-    if (!mount || !cfg) return;
-
-    mountSpecial(mount, cfg);
+    const id = IS_MOBILE_READER ? "runtime-mobile-interstitial" : "runtime-desktop-interstitial";
+    await mountRuntimeSpecial(id, cfg);
     await delay(INTERSTITIAL_DELAY_MS);
   }
 
   function scheduleVideoSlider() {
     if (IS_MOBILE_READER || videoSliderLoaded || videoSliderScheduled) return;
 
-    const mount = document.getElementById("desktopVideoSliderMount");
-    if (!mount) return;
-
     videoSliderScheduled = true;
-    window.setTimeout(() => {
+    window.setTimeout(async () => {
       if (videoSliderLoaded) return;
-      mountSpecial(mount, SPECIAL_ZONES.desktopVideoSlider);
+      await mountRuntimeSpecial("runtime-desktop-video-slider", SPECIAL_ZONES.desktopVideoSlider);
       videoSliderLoaded = true;
     }, VIDEO_SLIDER_DELAY_MS);
   }
 
-  function loadMobileStickyBanner(force = false) {
+  async function loadMobileStickyBanner(force = false) {
     if (!IS_MOBILE_READER) return;
+
     const mount = document.getElementById("mobileStickyMount");
     if (!mount) return;
-
     if (mobileStickyLoaded && !force) return;
 
-    fillSlot(mount, SPECIAL_ZONES.mobileSticky.zoneId, 1, 1, 1, SPECIAL_ZONES.mobileSticky.className);
+    await ensureAdProviderScript(SPECIAL_ZONES.mobileSticky.host);
+    mount.innerHTML = "";
+    mount.appendChild(makeSpecialIns(SPECIAL_ZONES.mobileSticky.zoneId, SPECIAL_ZONES.mobileSticky.className));
+    stampSlotRefresh(mount);
+    serveAds(true);
     mobileStickyLoaded = true;
   }
 
@@ -574,7 +653,7 @@
 
     const slot = document.createElement("div");
     slot.className = "slot recommend-slot";
-    slot.appendChild(makeIns(SPECIAL_ZONES.desktopRecommend.zoneId, 1, 1, 1, SPECIAL_ZONES.desktopRecommend.className));
+    slot.appendChild(makeSpecialIns(SPECIAL_ZONES.desktopRecommend.zoneId, SPECIAL_ZONES.desktopRecommend.className));
     shell.appendChild(slot);
 
     return shell;
@@ -1081,14 +1160,13 @@
     return refreshed;
   }
 
-  function refreshMobileSticky() {
+  async function refreshMobileSticky() {
     if (!IS_MOBILE_READER) return false;
     const mount = document.getElementById("mobileStickyMount");
     if (!mount || document.hidden) return false;
     if (!canRefreshSlot(mount)) return false;
 
-    refillSlot(mount, SPECIAL_ZONES.mobileSticky.zoneId, 1, 1, 1, SPECIAL_ZONES.mobileSticky.className);
-    serveAds();
+    await loadMobileStickyBanner(true);
     return true;
   }
 
@@ -1279,7 +1357,7 @@
       scheduleVideoSlider();
     } else {
       clearDesktopAdShells();
-      loadMobileStickyBanner();
+      await loadMobileStickyBanner();
     }
 
     reader.innerHTML = "";
@@ -1341,6 +1419,7 @@
     const recommend = buildRecommendationWidget();
     if (recommend) {
       reader.appendChild(recommend);
+      await ensureAdProviderScript(SPECIAL_ZONES.desktopRecommend.host);
     }
 
     const bottomAnchor = document.createElement("span");
@@ -1424,6 +1503,11 @@
   }
 
   async function boot() {
+    await Promise.all([
+      ensureAdProviderScript("https://a.magsrv.com/ad-provider.js"),
+      ensureAdProviderScript("https://a.pemsrv.com/ad-provider.js")
+    ]);
+
     await loadLibrary();
 
     wireTopFlyouts();
