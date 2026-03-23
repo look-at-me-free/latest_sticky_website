@@ -29,7 +29,6 @@
     betweenMulti: 5867482
   };
 
-  // Exact exported special zones.
   const SPECIAL_ZONES = {
     desktopInterstitial: {
       zoneId: 5880058,
@@ -95,6 +94,7 @@
   let videoSliderLoaded = false;
   let videoSliderScheduled = false;
   let mobileStickyLoaded = false;
+  let retentionToastTimer = null;
 
   const providerLoadPromises = new Map();
 
@@ -193,9 +193,7 @@
   }
 
   function getItemJsonUrl(work, entry) {
-    if (entry?.item_url) {
-      return entry.item_url;
-    }
+    if (entry?.item_url) return entry.item_url;
 
     const entryPathOrSlug = entry?.path || entry?.slug || "";
     const safeParts = String(entryPathOrSlug)
@@ -206,14 +204,16 @@
     return `${getWorkBase(work, entry)}/${encodeURIComponent(work.slug)}/${safeParts.join("/")}/${ITEM_JSON_NAME}`;
   }
 
-  function scrollToReaderTop() {
+  function scrollToReaderTopInstant() {
     const target =
       document.getElementById("readerTopAnchor") ||
       document.getElementById("reader") ||
       document.getElementById("searchBarAnchor");
 
     if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      target.scrollIntoView({ behavior: "auto", block: "start" });
+    } else {
+      window.scrollTo(0, 0);
     }
   }
 
@@ -442,6 +442,25 @@
     await delay(INTERSTITIAL_DELAY_MS);
   }
 
+  function positionDesktopStickyAwayFromVideo() {
+    if (IS_MOBILE_READER) return;
+
+    const stickyCluster = document.getElementById("stickyCluster");
+    const progressChip = document.querySelector(".chapter-progress-chip");
+
+    if (stickyCluster) {
+      stickyCluster.style.right = "auto";
+      stickyCluster.style.left = "18px";
+      stickyCluster.style.bottom = "18px";
+    }
+
+    if (progressChip) {
+      progressChip.style.left = "18px";
+      progressChip.style.right = "auto";
+      progressChip.style.bottom = "140px";
+    }
+  }
+
   function scheduleVideoSlider() {
     if (IS_MOBILE_READER || videoSliderLoaded || videoSliderScheduled) return;
 
@@ -450,6 +469,7 @@
       if (videoSliderLoaded) return;
       await mountRuntimeSpecial("runtime-desktop-video-slider", SPECIAL_ZONES.desktopVideoSlider);
       videoSliderLoaded = true;
+      positionDesktopStickyAwayFromVideo();
     }, VIDEO_SLIDER_DELAY_MS);
   }
 
@@ -768,7 +788,7 @@
       await switchEntry(btn.dataset.dir, btn.dataset.file, false, { actionSource: "search" });
 
       if (IS_MOBILE_READER) {
-        scrollToReaderTop();
+        scrollToReaderTopInstant();
       }
     });
 
@@ -944,7 +964,7 @@
       setMobileOpenWork(dir);
       burstServeAds();
       await switchEntry(dir, file, false, { actionSource: "mobile-nav" });
-      scrollToReaderTop();
+      scrollToReaderTopInstant();
     });
   }
 
@@ -958,6 +978,11 @@
       prev: currentIndex > 0 ? entries[currentIndex - 1] : null,
       next: currentIndex >= 0 && currentIndex < entries.length - 1 ? entries[currentIndex + 1] : null
     };
+  }
+
+  function getCurrentChapterPosition() {
+    const { currentIndex } = getEntryContext();
+    return currentIndex >= 0 ? currentIndex + 1 : 0;
   }
 
   function makeTraversalPill(label, onClick, extraClass = "", disabled = false) {
@@ -989,7 +1014,10 @@
     if (!IS_MOBILE_READER && position === "bottom") {
       const prompt = document.createElement("div");
       prompt.className = "continue-prompt";
-      prompt.textContent = "Finished this chapter? Pick the next move right here.";
+      const { next } = getEntryContext();
+      prompt.textContent = next
+        ? `Finished this chapter? Continue straight into ${next.subtitle || titleCaseSlug(next.slug)}.`
+        : "Finished this chapter? Pick your next move right here.";
       shell.appendChild(prompt);
     }
 
@@ -1017,7 +1045,7 @@
 
       bar.appendChild(
         makeTraversalPill(
-          "Next →",
+          next ? `Next: ${next.subtitle || titleCaseSlug(next.slug)}` : "Next →",
           next ? () => switchEntry(CURRENT_WORK.slug, next.slug, false, { actionSource: "mobile-next" }) : null,
           "",
           !next
@@ -1041,11 +1069,71 @@
     }
 
     if (next) {
-      bar.appendChild(makeTraversalPill("Next →", () => switchEntry(CURRENT_WORK.slug, next.slug, false, { actionSource: "next" })));
+      bar.appendChild(makeTraversalPill(`Next: ${next.subtitle || titleCaseSlug(next.slug)}`, () => switchEntry(CURRENT_WORK.slug, next.slug, false, { actionSource: "next" })));
     }
 
     shell.appendChild(bar);
     return shell;
+  }
+
+  function updateStickyBottomAction(progress = 0) {
+    const btn = document.getElementById("scrollToBottomTraversalBtn");
+    if (!btn) return;
+
+    const { next } = getEntryContext();
+
+    if (progress >= 0.9 && next) {
+      btn.textContent = `Continue: ${next.subtitle || titleCaseSlug(next.slug)}`;
+      btn.onclick = async () => {
+        burstServeAds();
+        await switchEntry(CURRENT_WORK.slug, next.slug, false, { actionSource: "sticky-next" });
+      };
+      return;
+    }
+
+    btn.textContent = "Last Page | Traversal Options";
+    btn.onclick = () => {
+      burstServeAds();
+      const target = document.getElementById("bottomTraversal") || document.getElementById("readerBottomAnchor");
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+  }
+
+  function showRetentionToast(message) {
+    if (IS_MOBILE_READER) return;
+
+    let toast = document.getElementById("readerRetentionToast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "readerRetentionToast";
+      toast.style.position = "fixed";
+      toast.style.top = "18px";
+      toast.style.right = "18px";
+      toast.style.zIndex = "7001";
+      toast.style.padding = "12px 14px";
+      toast.style.border = "1px solid rgba(255,255,255,.14)";
+      toast.style.borderRadius = "16px";
+      toast.style.background = "rgba(12,14,20,.88)";
+      toast.style.backdropFilter = "blur(14px)";
+      toast.style.boxShadow = "0 18px 50px rgba(0,0,0,.35)";
+      toast.style.color = "#f7f8fb";
+      toast.style.fontFamily = '"Handjet", system-ui, sans-serif';
+      toast.style.fontSize = "16px";
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(-8px)";
+      toast.style.transition = "opacity .18s ease, transform .18s ease";
+      document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+
+    if (retentionToastTimer) clearTimeout(retentionToastTimer);
+    retentionToastTimer = window.setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(-8px)";
+    }, 1200);
   }
 
   function updateChapterProgress(progress = 0) {
@@ -1060,7 +1148,13 @@
     if (pageBar) pageBar.style.width = `${percent}%`;
     if (fill) fill.style.width = `${percent}%`;
     if (text) text.textContent = `${percent}%`;
-    if (label) label.textContent = CURRENT_ENTRY?.subtitle || CURRENT_ITEM?.subtitle || "Chapter Progress";
+    if (label) {
+      const chapterNo = getCurrentChapterPosition();
+      const baseLabel = CURRENT_ENTRY?.subtitle || CURRENT_ITEM?.subtitle || "Chapter Progress";
+      label.textContent = chapterNo ? `Chapter ${chapterNo} · ${baseLabel}` : baseLabel;
+    }
+
+    updateStickyBottomAction(clamped);
 
     const bottomBtn = document.getElementById("scrollToBottomTraversalBtn");
     if (bottomBtn && clamped >= BOTTOM_GLOW_PROGRESS && !bottomGlowTriggered) {
@@ -1080,7 +1174,6 @@
     stickyControlsWired = true;
 
     const topBtn = document.getElementById("scrollToSearchBtn");
-    const bottomBtn = document.getElementById("scrollToBottomTraversalBtn");
 
     if (topBtn) {
       topBtn.addEventListener("click", () => {
@@ -1089,13 +1182,7 @@
       });
     }
 
-    if (bottomBtn) {
-      bottomBtn.addEventListener("click", () => {
-        burstServeAds();
-        const target = document.getElementById("bottomTraversal") || document.getElementById("readerBottomAnchor");
-        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
+    updateStickyBottomAction(0);
   }
 
   function clearRefreshTimers() {
@@ -1266,9 +1353,10 @@
     const row = document.createElement("div");
     row.className = "meta-row";
 
+    const chapterNo = getCurrentChapterPosition();
     const leftTag = document.createElement("div");
     leftTag.className = "chapter-tag";
-    leftTag.textContent = `${manifest.title || CURRENT_WORK.display || titleCaseSlug(CURRENT_WORK.slug)} · ${manifest.subtitle || CURRENT_ENTRY.subtitle || titleCaseSlug(CURRENT_ENTRY.slug)}`;
+    leftTag.textContent = `${manifest.title || CURRENT_WORK.display || titleCaseSlug(CURRENT_WORK.slug)} · ${manifest.subtitle || CURRENT_ENTRY.subtitle || titleCaseSlug(CURRENT_ENTRY.slug)}${chapterNo ? ` · #${chapterNo}` : ""}`;
 
     const rightTag = document.createElement("div");
     rightTag.className = "chapter-tag";
@@ -1281,7 +1369,7 @@
     note.className = "chapter-note";
     note.textContent = IS_MOBILE_READER
       ? "Use the chapter controls above or below the pages whenever you want to jump fast."
-      : "Use the search bar for instant jumps, keep the quick controls in view, and roll straight into the next chapter when you hit the end.";
+      : "Keep reading. Use the bottom controls to roll straight into the next chapter without losing momentum.";
 
     meta.appendChild(row);
     meta.appendChild(note);
@@ -1301,13 +1389,23 @@
 
   function shouldShowInterstitial(dir, file, options = {}) {
     if (options.skipInterstitial) return false;
+
     const selection = resolveSelection(dir, file);
     if (!selection) return false;
 
     const entries = Array.isArray(selection.work?.entries) ? selection.work.entries : [];
     const targetIndex = entries.findIndex(entry => normalizeKey(entry.slug) === normalizeKey(file));
 
-    return targetIndex > 0;
+    // Skip first three chapters.
+    if (targetIndex < 3) return false;
+
+    const isDifferentChapter =
+      normalizeKey(dir) !== normalizeKey(CURRENT_WORK?.slug) ||
+      normalizeKey(file) !== normalizeKey(CURRENT_ENTRY?.slug);
+
+    if (!isDifferentChapter) return false;
+
+    return true;
   }
 
   async function buildReader() {
@@ -1355,6 +1453,7 @@
       fillSlot(document.getElementById("topBannerSlot"), ZONES.topBanner, subids.top, subids.work, 1);
       fillRailStacks(subids);
       scheduleVideoSlider();
+      positionDesktopStickyAwayFromVideo();
     } else {
       clearDesktopAdShells();
       await loadMobileStickyBanner();
@@ -1379,7 +1478,7 @@
     note.className = "note";
     note.textContent = IS_MOBILE_READER
       ? "Tap through chapters up top, then just sink into the scroll."
-      : "W̸e̴l̷c̷o̷m̷e̶ ̸B̴a̷c̸k̴,̷ ̶D̶e̸g̴e̶n̴e̴r̷a̸t̸e̷";
+      : "Stay in the flow. Bottom controls keep you moving into the next chapter fast.";
     reader.appendChild(note);
 
     reader.appendChild(buildTraversal("top"));
@@ -1458,11 +1557,8 @@
       window.setTimeout(() => burstServeAds(), 600);
     }
 
-    if (IS_MOBILE_READER) {
-      scrollToReaderTop();
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    scrollToReaderTopInstant();
+    showRetentionToast(`Now reading: ${CURRENT_ENTRY?.subtitle || titleCaseSlug(file)}`);
   }
 
   function wireDocumentVisibility() {
@@ -1523,6 +1619,7 @@
 
     window.addEventListener("popstate", async () => {
       await buildReader();
+      scrollToReaderTopInstant();
     });
   }
 
