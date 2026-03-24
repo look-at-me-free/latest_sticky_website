@@ -278,6 +278,62 @@
     { "slug": "chapter_12", "path": "volume_3/chapter_12", "type": "chapter", "subtitle": "Chapter 12" }
   ]
 },{
+    "id":  4360,
+    "slug":  "Ichi_the_Killer",
+    "display":  "Ichi the Killer",
+    "top_pill":  true,
+    "source":  "d",
+    "entries":  [
+                    {
+                        "slug":  "v1_c1",
+                        "path":  "volume_1/chapter_1",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 1"
+                    },
+                    {
+                        "slug":  "v1_i1",
+                        "path":  "volume_1/chapter_1.2",
+                        "type":  "chapter",
+                        "subtitle":  "Chapter 1.2"
+                    },
+                    {
+                        "slug":  "v1_i1",
+                        "path":  "volume_1/chapter_1.7",
+                        "type":  "chapter",
+                        "subtitle":  "Chapter 1.7"
+                    },
+                    {
+                        "slug":  "v1_i1",
+                        "path":  "volume_1/chapter_1.9",
+                        "type":  "chapter",
+                        "subtitle":  "Chapter 1.9"
+                    },
+                    {
+                        "slug":  "v1_c2",
+                        "path":  "volume_1/chapter_2",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 2"
+                    },
+                    {
+                        "slug":  "v1_i2",
+                        "path":  "volume_1/chapter_2.1",
+                        "type":  "chapter",
+                        "subtitle":  "Chapter 2.1"
+                    },
+                    {
+                        "slug":  "v1_i2",
+                        "path":  "volume_1/chapter_2.5",
+                        "type":  "chapter",
+                        "subtitle":  "Chapter 2.5"
+                    },
+                    {
+                        "slug":  "v1_i2",
+                        "path":  "volume_1/chapter_2.7",
+                        "type":  "chapter",
+                        "subtitle":  "Chapter 2.7"
+                    }
+                ]
+},{
     "id":  123456789,
     "slug":  "20th_Century_Boys",
     "display":  "20th Century Boys",
