@@ -1889,6 +1889,56 @@
                     }
                 ]
 },{
+    "id":  117,
+    "slug":  "Dorohedoro",
+    "display":  "Dorohedoro",
+    "top_pill":  true,
+    "source":  "d",
+    "entries":  [
+                    {
+                        "slug":  "v1_c1",
+                        "path":  "volume_1/chapter_1",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 1"
+                    },
+                    {
+                        "slug":  "v1_c2",
+                        "path":  "volume_1/chapter_2",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 2"
+                    },
+                    {
+                        "slug":  "v1_c3",
+                        "path":  "volume_1/chapter_3",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 3"
+                    },
+                    {
+                        "slug":  "v1_c4",
+                        "path":  "volume_1/chapter_4",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 4"
+                    },
+                    {
+                        "slug":  "v1_c5",
+                        "path":  "volume_1/chapter_5",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 5"
+                    },
+                    {
+                        "slug":  "v1_c6",
+                        "path":  "volume_1/chapter_6",
+                        "type":  "chapter",
+                        "subtitle":  "Volume 1 - Chapter 6"
+                    },
+                    {
+                        "slug":  "v1_i6",
+                        "path":  "volume_1/chapter_6.5",
+                        "type":  "chapter",
+                        "subtitle":  "Chapter 6.5"
+                    }
+                ]
+}, {
     "id":  1234567,
     "slug":  "Monster",
     "display":  "Monster",
