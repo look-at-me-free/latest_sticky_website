@@ -6462,24 +6462,6 @@
       ]
     },
     {
-      "id": 401,
-      "slug": "bark",
-      "display": "Berserk",
-      "top_pill": true,
-      "source": "a",
-      "entries": [
-        { "slug": "chapter_1", "path": "book_1/chapter_1", "type": "chapter", "subtitle": "Chapter 1" },
-        { "slug": "chapter_2", "path": "book_1/chapter_2", "type": "chapter", "subtitle": "Chapter 2" },
-        { "slug": "chapter_3", "path": "book_1/chapter_3", "type": "chapter", "subtitle": "Chapter 3" },
-        { "slug": "chapter_4", "path": "book_2/chapter_4", "type": "chapter", "subtitle": "Chapter 4" },
-        { "slug": "chapter_5", "path": "book_2/chapter_5", "type": "chapter", "subtitle": "Chapter 5" },
-        { "slug": "chapter_6", "path": "book_3/chapter_6", "type": "chapter", "subtitle": "Chapter 6" },
-        { "slug": "chapter_7", "path": "book_3/chapter_7", "type": "chapter", "subtitle": "Chapter 7" },
-        { "slug": "chapter_8", "path": "book_3/chapter_8", "type": "chapter", "subtitle": "Chapter 8" },
-        { "slug": "chapter_9", "path": "book_3/chapter_9", "type": "chapter", "subtitle": "Chapter 9" }
-      ]
-    },
-    {
     "id":  3724,
     "slug":  "The_Flowers_of_Evil",
     "display":  "The Flowers of Evil",
