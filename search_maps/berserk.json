@@ -1,0 +1,55 @@
+{
+  "series": "Berserk",
+
+  "entry_overrides": {
+    "v38_p4": {
+      "display_label": "Chapters 151–154",
+      "arc": "Conviction Arc",
+      "search_terms": [
+        "chapter 151",
+        "chapter 152",
+        "chapter 153",
+        "chapter 154",
+        "berserk 152"
+      ]
+    }
+  },
+
+  "arcs": [
+    {
+      "id": "golden_age",
+      "label": "Golden Age Arc",
+      "target_slug": "v3_p1",
+      "search_terms": [
+        "golden age",
+        "band of the hawk"
+      ]
+    },
+    {
+      "id": "eclipse",
+      "label": "Eclipse Arc",
+      "target_slug": "v13_p2",
+      "search_terms": [
+        "eclipse",
+        "berserk eclipse",
+        "griffith eclipse"
+      ]
+    }
+  ],
+
+  "entrypoints": [
+    {
+      "term": "guts",
+      "targets": [
+        "v13_p2",
+        "v38_p4"
+      ]
+    },
+    {
+      "term": "devastated",
+      "targets": [
+        "v13_p2"
+      ]
+    }
+  ]
+}
