@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wallace Archive Reader</title>
 
+  <meta http-equiv="Delegate-CH" content="Sec-CH-UA https://s.magsrv.com; Sec-CH-UA-Mobile https://s.magsrv.com; Sec-CH-UA-Arch https://s.magsrv.com; Sec-CH-UA-Model https://s.magsrv.com; Sec-CH-UA-Platform https://s.magsrv.com; Sec-CH-UA-Platform-Version https://s.magsrv.com; Sec-CH-UA-Bitness https://s.magsrv.com; Sec-CH-UA-Full-Version-List https://s.magsrv.com; Sec-CH-UA-Full-Version https://s.magsrv.com;">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&family=Rampart+One&family=Rubik+Iso&family=Rubik+Broken+Fax&display=swap" rel="stylesheet">
@@ -47,13 +49,21 @@
       --panel3:rgba(255,255,255,.1);
       --shadow:0 24px 70px rgba(0,0,0,.45);
       --radius:22px;
-      --railW:min(380px, 26vw);
+
+      --railW:min(320px, 23vw);
       --readerW:min(760px, 100%);
       --maxw:1660px;
+
       --title-font:"Rampart One", system-ui, sans-serif;
       --subtitle-font:"Rubik Iso", system-ui, sans-serif;
       --ui-font:"Handjet", system-ui, sans-serif;
       --pill-font:"Handjet", system-ui, sans-serif;
+
+      --stickyTopStart:24px;
+      --stickyGap:26px;
+      --stickyTopOffset1:24px;
+      --stickyTopOffset2:300px;
+      --stickyTopOffset3:576px;
     }
 
     *{ box-sizing:border-box; }
@@ -436,32 +446,82 @@
     }
 
     .layout{
-      max-width:1680px;
+      max-width:var(--maxw);
       margin:0 auto;
       padding:8px;
       display:grid;
-      grid-template-columns:var(--railW) minmax(0, 1fr) var(--railW);
-      gap:12px;
+      grid-template-columns:minmax(0,var(--railW)) minmax(0,1fr) minmax(0,var(--railW));
+      gap:16px;
       align-items:start;
     }
 
     .reader{
-      width:var(--readerW);
-      margin:0 auto;
+      width:100%;
       min-width:0;
       display:grid;
       gap:12px;
+      justify-items:center;
+    }
+
+    .reader > *{
+      width:100%;
+      max-width:var(--readerW);
+      min-width:0;
+    }
+
+    .image-wrap,
+    .image-wrap img{
+      max-width:100%;
+    }
+
+    .image-wrap img{
+      display:block;
+      width:100%;
+      height:auto;
+      object-fit:contain;
+      margin:0 auto;
     }
 
     .rail{
-      position:sticky;
-      top:20px;
-      height:max-content;
+      min-width:0;
+      align-self:start;
+    }
+
+    .rail-stack{
+      display:grid;
+      gap:var(--stickyGap);
+      align-content:start;
     }
 
     .rail-stack .slot{
       min-height:250px;
       padding:0;
+      width:100%;
+      max-width:100%;
+    }
+
+    .rail-stack .slot[data-sticky-slot="1"]{
+      position:relative;
+      top:auto;
+    }
+
+    body.reader-sticky-active .rail-stack .slot[data-sticky-slot="1"]{
+      position:sticky;
+    }
+
+    #leftStickyTop,
+    #rightStickyTop{
+      top:var(--stickyTopOffset1);
+    }
+
+    #leftStickyMid,
+    #rightStickyMid{
+      top:var(--stickyTopOffset2);
+    }
+
+    #leftStickyBottom,
+    #rightStickyBottom{
+      top:var(--stickyTopOffset3);
     }
 
     .slot,
@@ -487,13 +547,6 @@
     .image-wrap{
       background:#000;
       margin-bottom:6px;
-    }
-
-    .image-wrap img{
-      display:block;
-      width:100%;
-      height:auto;
-      background:#000;
     }
 
     .chapter-meta,
@@ -613,13 +666,17 @@
     }
 
     .between-grid .slot,
-    .end-grid .slot{ min-height:250px; padding:8px; }
+    .end-grid .slot{
+      min-height:250px;
+      padding:8px;
+    }
 
     .exo-slot ins,
     .slot ins,
     .top-banner-inner ins{
       display:block !important;
       margin:0 auto !important;
+      max-width:100% !important;
     }
 
     #stickyCluster{
@@ -728,23 +785,40 @@
     }
 
     @media (max-width: 1380px){
-      .layout{ grid-template-columns:1fr; }
-      .rail{ position:relative; top:auto; }
-      .rail-stack{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; }
-      .reader{ width:min(860px, 100%); }
+      .layout{
+        grid-template-columns:1fr;
+      }
+
+      .rail{
+        display:none;
+      }
+
+      .reader{
+        width:100%;
+      }
+
+      .reader > *{
+        max-width:min(860px, 100%);
+      }
     }
 
     @media (max-width: 980px){
       .search-row{ grid-template-columns:1fr; }
       .search-stat{ min-width:0; }
-      .topworks-flyout{ position:relative; top:10px; left:0; transform:none; min-width:100%; max-width:100%; }
-      .rail-stack{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+      .topworks-flyout{
+        position:relative;
+        top:10px;
+        left:0;
+        transform:none;
+        min-width:100%;
+        max-width:100%;
+      }
     }
 
     @media (max-width: 860px){
       .hero{ padding:28px 14px 18px; }
       .top-banner-shell, .layout{ padding-left:14px; padding-right:14px; }
-      .between-grid, .end-grid, .rail-stack{ grid-template-columns:1fr; }
+      .between-grid, .end-grid{ grid-template-columns:1fr; }
       .traversal-pill, .topworks-trigger, .search-result-pill, .sticky-btn{ font-size:14px; }
       #stickyCluster{ right:12px; bottom:12px; left:auto; }
       .chapter-progress-chip{ left:12px; bottom:12px; }
@@ -761,7 +835,7 @@
 <body>
   <div class="page-progress" aria-hidden="true"><div class="page-progress-bar" id="pageProgressBar"></div></div>
 
-  <header class="hero">
+  <header class="hero" id="heroHeader">
     <div class="hero-inner">
       <div class="hero-copy">
         <p class="eyebrow">Archive Reader</p>
@@ -780,14 +854,14 @@
         </div>
       </section>
 
-      <section class="works-strip-wrap" aria-label="Top works navigation">
+      <section class="works-strip-wrap" id="seriesPillArea" aria-label="Top works navigation">
         <p class="works-strip-label">Top Works</p>
         <nav class="works-strip" id="worksNav"></nav>
       </section>
     </div>
   </header>
 
-  <div class="top-banner-shell">
+  <div class="top-banner-shell" id="topBannerShellWrap">
     <div class="top-banner-frame">
       <p class="top-banner-label">Featured Placement</p>
       <div class="top-banner-bar">
@@ -797,39 +871,21 @@
   </div>
 
   <div class="layout">
-    <aside class="rail rail-left">
+    <aside class="rail rail-left" aria-label="Left rail">
       <div class="rail-stack">
-        <div class="slot exo-slot" id="leftRailSlot1"></div>
-        <div class="slot exo-slot" id="leftRailSlot2"></div>
-        <div class="slot exo-slot" id="leftRailSlot3"></div>
-        <div class="slot exo-slot" id="leftRailSlot4"></div>
-        <div class="slot exo-slot" id="leftRailSlot5"></div>
-        <div class="slot exo-slot" id="leftRailSlot6"></div>
-        <div class="slot exo-slot" id="leftRailSlot7"></div>
-        <div class="slot exo-slot" id="leftRailSlot8"></div>
-        <div class="slot exo-slot" id="leftRailSlot9"></div>
-        <div class="slot exo-slot" id="leftRailSlot10"></div>
-        <div class="slot exo-slot" id="leftRailSlot11"></div>
-        <div class="slot exo-slot" id="leftRailSlot12"></div>
+        <div class="slot exo-slot" id="leftStickyTop" data-sticky-slot="1"></div>
+        <div class="slot exo-slot" id="leftStickyMid" data-sticky-slot="1"></div>
+        <div class="slot exo-slot" id="leftStickyBottom" data-sticky-slot="1"></div>
       </div>
     </aside>
 
     <main class="reader" id="reader"></main>
 
-    <aside class="rail rail-right">
+    <aside class="rail rail-right" aria-label="Right rail">
       <div class="rail-stack">
-        <div class="slot exo-slot" id="rightRailSlot1"></div>
-        <div class="slot exo-slot" id="rightRailSlot2"></div>
-        <div class="slot exo-slot" id="rightRailSlot3"></div>
-        <div class="slot exo-slot" id="rightRailSlot4"></div>
-        <div class="slot exo-slot" id="rightRailSlot5"></div>
-        <div class="slot exo-slot" id="rightRailSlot6"></div>
-        <div class="slot exo-slot" id="rightRailSlot7"></div>
-        <div class="slot exo-slot" id="rightRailSlot8"></div>
-        <div class="slot exo-slot" id="rightRailSlot9"></div>
-        <div class="slot exo-slot" id="rightRailSlot10"></div>
-        <div class="slot exo-slot" id="rightRailSlot11"></div>
-        <div class="slot exo-slot" id="rightRailSlot12"></div>
+        <div class="slot exo-slot" id="rightStickyTop" data-sticky-slot="1"></div>
+        <div class="slot exo-slot" id="rightStickyMid" data-sticky-slot="1"></div>
+        <div class="slot exo-slot" id="rightStickyBottom" data-sticky-slot="1"></div>
       </div>
     </aside>
   </div>
@@ -848,40 +904,78 @@
     <div class="chapter-progress-track"><div class="chapter-progress-fill" id="chapterProgressFill"></div></div>
   </aside>
 
-  <script type="application/javascript">
-  (function() {
-    var adConfig = {
-      ads_host: "a.pemsrv.com",
-      syndication_host: "s.pemsrv.com",
-      idzone: 5865422,
-      popup_fallback: false,
-      popup_force: false,
-      chrome_enabled: true,
-      new_tab: false,
-      frequency_period: 720,
-      frequency_count: 1,
-      trigger_method: 3,
-      trigger_class: "",
-      trigger_delay: 0,
-      capping_enabled: true,
-      tcf_enabled: true,
-      only_inline: false
-    };
+  <script>
+    (function() {
+      var adConfig = {
+        ads_host: "a.pemsrv.com",
+        syndication_host: "s.pemsrv.com",
+        idzone: 5865422,
+        popup_fallback: false,
+        popup_force: false,
+        chrome_enabled: true,
+        new_tab: false,
+        frequency_period: 720,
+        frequency_count: 1,
+        trigger_method: 3,
+        trigger_class: "",
+        trigger_delay: 0,
+        capping_enabled: true,
+        tcf_enabled: true,
+        only_inline: false
+      };
 
-    var s = document.createElement("script");
-    s.type = "application/javascript";
-    s.async = true;
-    s.src = "//" + adConfig.ads_host + "/popunder1000.js";
-    s.id = "popmagicldr";
+      var s = document.createElement("script");
+      s.type = "application/javascript";
+      s.async = true;
+      s.src = "//" + adConfig.ads_host + "/popunder1000.js";
+      s.id = "popmagicldr";
 
-    for (var k in adConfig) {
-      if (!Object.prototype.hasOwnProperty.call(adConfig, k)) continue;
-      if (k === "ads_host" || k === "syndication_host") continue;
-      s.setAttribute("data-exo-" + k, adConfig[k]);
-    }
+      for (var k in adConfig) {
+        if (!Object.prototype.hasOwnProperty.call(adConfig, k)) continue;
+        if (k === "ads_host" || k === "syndication_host") continue;
+        s.setAttribute("data-exo-" + k, adConfig[k]);
+      }
 
-    document.body.appendChild(s);
-  })();
+      document.body.appendChild(s);
+    })();
+  </script>
+
+  <script>
+    (function () {
+      function syncStickyStart() {
+        var hero = document.getElementById("heroHeader");
+        var banner = document.getElementById("topBannerShellWrap");
+        if (!hero) return;
+
+        var total = hero.offsetHeight;
+        if (banner) total += banner.offsetHeight;
+
+        var start = Math.max(24, total - 8);
+
+        document.documentElement.style.setProperty("--stickyTopStart", start + "px");
+        document.documentElement.style.setProperty("--stickyTopOffset1", start + "px");
+        document.documentElement.style.setProperty("--stickyTopOffset2", (start + 276) + "px");
+        document.documentElement.style.setProperty("--stickyTopOffset3", (start + 552) + "px");
+      }
+
+      function syncStickyActivation() {
+        var hero = document.getElementById("heroHeader");
+        var banner = document.getElementById("topBannerShellWrap");
+        if (!hero) return;
+
+        var trigger = hero.offsetHeight + (banner ? banner.offsetHeight : 0) - 24;
+        document.body.classList.toggle("reader-sticky-active", window.scrollY > trigger);
+      }
+
+      function syncAll() {
+        syncStickyStart();
+        syncStickyActivation();
+      }
+
+      window.addEventListener("load", syncAll);
+      window.addEventListener("resize", syncAll);
+      window.addEventListener("scroll", syncStickyActivation, { passive: true });
+    })();
   </script>
 
   <script defer src="index.js"></script>
